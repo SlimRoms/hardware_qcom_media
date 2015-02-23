@@ -50,6 +50,7 @@ enum {
     kKeyWMAVirPktSize        = 'vpks',  // int64_t
 #endif
     kKeyWMAChannelMask       = 'chmk',  // int32_t
+    kKeyVorbisData           = 'vdat',  // raw data
 
     kKeyFileFormat           = 'ffmt',  // cstring
 
@@ -74,8 +75,6 @@ enum {
     kKeyMaxFrmSize           = 'mafs', //int32_t
     kKeyMd5Sum               = 'md5s', //cstring
     kKeyBatchSize            = 'btch', //int32_t
-    kKeyIsByteMode           = 'bytm', //int32_t
-    kKeyUseSetBuffers        = 'setb', //bool (int32_t)
 };
 
 #if 0

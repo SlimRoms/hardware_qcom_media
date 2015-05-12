@@ -42,7 +42,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C"{
 #include<utils/Log.h>
 }
-:mm-video-legacy/vidc/common/inc/extra_data_handler.h
 #endif // _ANDROID_
 
 #include "vidc_debug.h"

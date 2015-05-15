@@ -483,16 +483,13 @@ enum OMX_QCOM_EXTN_INDEXTYPE
     /*"OMX.QCOM.index.param.video.Mpeg2SeqDispExtraData"*/
     OMX_QcomIndexParamMpeg2SeqDispExtraData = 0x7F000040,
 
-    /* Max Hierarchical P layers */
-    OMX_QcomIndexMaxHierarchicallayers = 0x7F000041,
+    OMX_GoogleAndroidIndexPrepareForAdaptivePlayback = 0x7F00002D,
 
-    /* Set Encoder Performance Index */
-    OMX_QcomIndexConfigVideoVencPerfMode = 0x7F000042,
+    OMX_QTIIndexParamVQZipSEIExtraData = 0x7F000052,
 
-    /* Set Hybrid Hier-p layers */
-    OMX_QcomIndexParamVideoHybridHierpMode = 0x7F000043,
+    /* Enable VQZIP SEI NAL type */
+    OMX_QTIIndexParamVQZIPSEIType = 0x7F000053,
 
-    OMX_QcomIndexFlexibleYUVDescription = 0x7F000044,
 };
 
 /**
@@ -943,6 +940,17 @@ typedef struct OMX_QCOM_VIDEO_PARAM_PEAK_BITRATE {
     OMX_U32 nPeakBitrate;       /** Peak bitrate value */
 } OMX_QCOM_VIDEO_PARAM_PEAK_BITRATE;
 
+/**
+ * This structure describes the parameters corresponding
+ * to OMX_QcomIndexParamVQZIPSEIType extension. It
+ * will enable/disable the VQZIP SEI info.
+ */
+typedef struct OMX_QTI_VIDEO_PARAM_VQZIP_SEI_TYPE {
+    OMX_U32 nSize;              /** Size of the structure in bytes */
+    OMX_VERSIONTYPE nVersion;   /** OMX specification version information */
+    OMX_BOOL bEnable;           /** Enable/disable the setting */
+} OMX_QTI_VIDEO_PARAM_VQZIP_SEI_TYPE;
+
 typedef struct OMX_VENDOR_EXTRADATATYPE  {
     OMX_U32 nPortIndex;
     OMX_U32 nDataSize;
@@ -1110,36 +1118,25 @@ typedef union OMX_QCOM_EXTRADATA_CODEC_DATA
    OMX_QCOM_VC1EXTRADATA vc1ExtraData;
 } OMX_QCOM_EXTRADATA_CODEC_DATA;
 
-typedef struct OMX_QCOM_EXTRADATA_MBINFO
-{
-   OMX_U32 nFormat;
-   OMX_U32 nDataSize;
-   OMX_U8  data[0];
-} OMX_QCOM_EXTRADATA_MBINFO;
-
-typedef struct OMX_QCOM_EXTRADATA_MPEG2SEQDISPLAY {
-    OMX_U32 disp_width;
-    OMX_U32 disp_height;
-} OMX_QCOM_EXTRADATA_MPEG2SEQDISPLAY;
+typedef struct OMX_QCOM_EXTRADATA_VQZIPSEI {
+    OMX_U32 nSize;
+    OMX_U8 data[0];
+} OMX_QCOM_EXTRADATA_VQZIPSEI;
 
 typedef enum OMX_QCOM_EXTRADATATYPE
 {
-   OMX_ExtraDataFrameInfo = 0x7F000001,
-   OMX_ExtraDataH264 = 0x7F000002,
-   OMX_ExtraDataVC1 = 0x7F000003,
-   OMX_ExtraDataFrameDimension = 0x7F000004,
-   OMX_ExtraDataVideoEncoderSliceInfo = 0x7F000005,
-   OMX_ExtraDataConcealMB = 0x7F000006,
-   OMX_ExtraDataInterlaceFormat = 0x7F000007,
-   OMX_ExtraDataPortDef = 0x7F000008,
-   OMX_ExtraDataMP2ExtnData = 0x7F000009,
-   OMX_ExtraDataMP2UserData = 0x7F00000a,
-   OMX_ExtraDataVideoLTRInfo = 0x7F00000b,
-    OMX_ExtraDataFramePackingArrangement = 0x7F00000c,
-    OMX_ExtraDataQP =                      0x7F00000d,
-    OMX_ExtraDataInputBitsInfo =           0x7F00000e,
-    OMX_ExtraDataVideoEncoderMBInfo =      0x7F00000f,
-    OMX_ExtraDataMpeg2SeqDisplay =         0x7F000010,
+    OMX_ExtraDataFrameInfo =               0x7F000001,
+    OMX_ExtraDataH264 =                    0x7F000002,
+    OMX_ExtraDataVC1 =                     0x7F000003,
+    OMX_ExtraDataFrameDimension =          0x7F000004,
+    OMX_ExtraDataVideoEncoderSliceInfo =   0x7F000005,
+    OMX_ExtraDataConcealMB =               0x7F000006,
+    OMX_ExtraDataInterlaceFormat =         0x7F000007,
+    OMX_ExtraDataPortDef =                 0x7F000008,
+    OMX_ExtraDataMP2ExtnData =             0x7F000009,
+    OMX_ExtraDataMP2UserData =             0x7F00000a,
+    OMX_ExtraDataVideoLTRInfo =            0x7F00000b,
+    OMX_ExtraDataVQZipSEI  =               0x7F000010,
 } OMX_QCOM_EXTRADATATYPE;
 
 typedef struct  OMX_STREAMINTERLACEFORMATTYPE {

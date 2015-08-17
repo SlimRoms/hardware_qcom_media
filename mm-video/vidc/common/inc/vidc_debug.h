@@ -34,7 +34,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 enum {
    PRIO_ERROR=0x1,
-   PRIO_WARN=0x1,
    PRIO_INFO=0x1,
    PRIO_HIGH=0x2,
    PRIO_LOW=0x4
@@ -45,31 +44,25 @@ extern int debug_level;
 #undef DEBUG_PRINT_ERROR
 #define DEBUG_PRINT_ERROR(fmt, args...) ({ \
       if (debug_level & PRIO_ERROR) \
-          ALOGE("(%d) - " fmt,__LINE__,##args); \
-      })
-#undef DEBUG_PRINT_WARN
-#define DEBUG_PRINT_WARN(fmt, args...) ({ \
-      if (debug_level & PRIO_WARN) \
-          ALOGW("(%d) - " fmt,__LINE__,##args); \
+          ALOGE(fmt,##args); \
       })
 #undef DEBUG_PRINT_INFO
 #define DEBUG_PRINT_INFO(fmt, args...) ({ \
       if (debug_level & PRIO_INFO) \
-          ALOGI("(%d) - " fmt,__LINE__,##args); \
+          ALOGI(fmt,##args); \
       })
 #undef DEBUG_PRINT_LOW
 #define DEBUG_PRINT_LOW(fmt, args...) ({ \
       if (debug_level & PRIO_LOW) \
-          ALOGD("(%d) - " fmt,__LINE__,##args); \
+          ALOGD(fmt,##args); \
       })
 #undef DEBUG_PRINT_HIGH
 #define DEBUG_PRINT_HIGH(fmt, args...) ({ \
       if (debug_level & PRIO_HIGH) \
-          ALOGD("(%d) - " fmt,__LINE__,##args); \
+          ALOGD(fmt,##args); \
       })
 #else
 #define DEBUG_PRINT_ERROR printf
-#define DEBUG_PRINT_WARN printf
 #define DEBUG_PRINT_INFO printf
 #define DEBUG_PRINT_LOW printf
 #define DEBUG_PRINT_HIGH printf

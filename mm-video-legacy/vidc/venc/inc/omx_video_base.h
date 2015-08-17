@@ -41,13 +41,14 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //                             Include Files
 //////////////////////////////////////////////////////////////////////////////
 
-#include<stdlib.h>
+#define LOG_TAG "OMX-VENC"
+#include <stdlib.h>
 #include <stdio.h>
 #include <sys/mman.h>
 #ifdef _ANDROID_
-  #include <binder/MemoryHeapBase.h>
+#include <binder/MemoryHeapBase.h>
 #ifdef _ANDROID_ICS_
-  #include "QComOMXMetadata.h"
+#include "QComOMXMetadata.h"
 #endif
 #endif // _ANDROID_
 #include <pthread.h>
@@ -61,6 +62,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <linux/videodev2.h>
 #include <dlfcn.h>
 #include "C2DColorConverter.h"
+#include "vidc_debug.h"
 
 #ifdef _ANDROID_
 using namespace android;
@@ -73,27 +75,6 @@ public:
 };
 
 #include <utils/Log.h>
-#define LOG_TAG "OMX-VENC-720p"
-#ifdef ENABLE_DEBUG_LOW
-#define DEBUG_PRINT_LOW ALOGV
-#else
-#define DEBUG_PRINT_LOW
-#endif
-#ifdef ENABLE_DEBUG_HIGH
-#define DEBUG_PRINT_HIGH  ALOGV
-#else
-#define DEBUG_PRINT_HIGH
-#endif
-#ifdef ENABLE_DEBUG_ERROR
-#define DEBUG_PRINT_ERROR ALOGE
-#else
-#define DEBUG_PRINT_ERROR
-#endif
-
-#else //_ANDROID_
-#define DEBUG_PRINT_LOW
-#define DEBUG_PRINT_HIGH
-#define DEBUG_PRINT_ERROR
 #endif // _ANDROID_
 
 #ifdef USE_ION

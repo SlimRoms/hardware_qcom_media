@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------
-Copyright (c) 2010-2012, The Linux Foundation. All rights reserved.
+Copyright (c) 2010-2013, 2015, The Linux Foundation. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -68,6 +68,9 @@ omx_venc::omx_venc()
   memset(opaque_buffer_hdr,0,sizeof(opaque_buffer_hdr));
   mUseProxyColorFormat = false;
 #endif
+  char property_value[PROPERTY_VALUE_MAX] = {0};
+  property_get("vidc.debug.level", property_value, "1");
+  debug_level = atoi(property_value);
 }
 
 omx_venc::~omx_venc()
@@ -248,7 +251,7 @@ OMX_ERRORTYPE omx_venc::component_init(OMX_STRING role)
   m_sInPortDef.bPopulated = OMX_FALSE;
   m_sInPortDef.eDomain = OMX_PortDomainVideo;
   m_sInPortDef.eDir = OMX_DirInput;
-  m_sInPortDef.format.video.cMIMEType = "YUV420";
+  m_sInPortDef.format.video.cMIMEType = (char *)"YUV420";
   m_sInPortDef.format.video.nFrameWidth = OMX_CORE_QCIF_WIDTH;
   m_sInPortDef.format.video.nFrameHeight = OMX_CORE_QCIF_HEIGHT;
   m_sInPortDef.format.video.nStride = OMX_CORE_QCIF_WIDTH;
@@ -477,6 +480,7 @@ OMX_ERRORTYPE  omx_venc::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
                                        OMX_IN OMX_INDEXTYPE paramIndex,
                                        OMX_IN OMX_PTR        paramData)
 {
+  (void)hComp;
   OMX_ERRORTYPE eRet = OMX_ErrorNone;
 
 
@@ -505,7 +509,7 @@ OMX_ERRORTYPE  omx_venc::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
     return OMX_ErrorIncorrectStateOperation;
   }
 
-  switch(paramIndex)
+  switch((unsigned long)paramIndex)
   {
   case OMX_IndexParamPortDefinition:
     {
@@ -515,7 +519,7 @@ OMX_ERRORTYPE  omx_venc::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
            (int)portDefn->format.video.nFrameHeight,
            (int)portDefn->format.video.nFrameWidth);
 
-      if(PORT_INDEX_IN == portDefn->nPortIndex)
+      if (PORT_INDEX_IN == portDefn->nPortIndex)
       {
         DEBUG_PRINT_LOW("\n i/p actual cnt requested = %d\n", portDefn->nBufferCountActual);
         DEBUG_PRINT_LOW("\n i/p min cnt requested = %d\n", portDefn->nBufferCountMin);
@@ -1209,6 +1213,7 @@ OMX_ERRORTYPE  omx_venc::set_config(OMX_IN OMX_HANDLETYPE      hComp,
                                      OMX_IN OMX_INDEXTYPE configIndex,
                                      OMX_IN OMX_PTR        configData)
 {
+  (void)hComp;
   if(configData == NULL)
   {
     DEBUG_PRINT_ERROR("ERROR: param is null");
@@ -1222,7 +1227,7 @@ OMX_ERRORTYPE  omx_venc::set_config(OMX_IN OMX_HANDLETYPE      hComp,
   }
 
   // params will be validated prior to venc_init
-  switch(configIndex)
+  switch((unsigned long)configIndex)
   {
   case OMX_IndexConfigVideoBitrate:
     {
@@ -1439,6 +1444,7 @@ RETURN VALUE
 ========================================================================== */
 OMX_ERRORTYPE  omx_venc::component_deinit(OMX_IN OMX_HANDLETYPE hComp)
 {
+  (void) hComp;
   OMX_U32 i = 0;
   DEBUG_PRINT_HIGH("\n omx_venc(): Inside component_deinit()");
   if(OMX_StateLoaded != m_state)
@@ -1630,33 +1636,33 @@ int omx_venc::async_message_process (void *context, void* message)
   {
 
   case VEN_MSG_START:
-    omx->post_event (NULL,m_sVenc_msg->statuscode,\
+    omx->post_event (0,m_sVenc_msg->statuscode,\
                      OMX_COMPONENT_GENERATE_START_DONE);
     break;
 
   case VEN_MSG_STOP:
-    omx->post_event (NULL,m_sVenc_msg->statuscode,\
+    omx->post_event (0,m_sVenc_msg->statuscode,\
                      OMX_COMPONENT_GENERATE_STOP_DONE);
     break;
 
   case VEN_MSG_RESUME:
-    omx->post_event (NULL,m_sVenc_msg->statuscode,\
+    omx->post_event (0,m_sVenc_msg->statuscode,\
                      OMX_COMPONENT_GENERATE_RESUME_DONE);
     break;
 
   case VEN_MSG_PAUSE:
-    omx->post_event (NULL,m_sVenc_msg->statuscode,\
+    omx->post_event (0,m_sVenc_msg->statuscode,\
                      OMX_COMPONENT_GENERATE_PAUSE_DONE);
 
     break;
 
   case VEN_MSG_FLUSH_INPUT_DONE:
 
-    omx->post_event (NULL,m_sVenc_msg->statuscode,\
+    omx->post_event (0,m_sVenc_msg->statuscode,\
                      OMX_COMPONENT_GENERATE_EVENT_INPUT_FLUSH);
     break;
   case VEN_MSG_FLUSH_OUPUT_DONE:
-    omx->post_event (NULL,m_sVenc_msg->statuscode,\
+    omx->post_event (0,m_sVenc_msg->statuscode,\
                      OMX_COMPONENT_GENERATE_EVENT_OUTPUT_FLUSH);
     break;
   case VEN_MSG_INPUT_BUFFER_DONE:
@@ -1674,7 +1680,7 @@ int omx_venc::async_message_process (void *context, void* message)
 #ifdef _ANDROID_ICS_
       omx->omx_release_meta_buffer(omxhdr);
 #endif
-    omx->post_event ((unsigned int)omxhdr,m_sVenc_msg->statuscode,
+    omx->post_event ((unsigned long)omxhdr,m_sVenc_msg->statuscode,
                      OMX_COMPONENT_GENERATE_EBD);
     break;
   case VEN_MSG_OUTPUT_BUFFER_DONE:
@@ -1713,13 +1719,19 @@ int omx_venc::async_message_process (void *context, void* message)
       m_sVenc_msg->statuscode = VEN_S_EFAIL;
     }
 
-    omx->post_event ((unsigned int)omxhdr,m_sVenc_msg->statuscode,
+    omx->post_event ((unsigned long)omxhdr,m_sVenc_msg->statuscode,
                      OMX_COMPONENT_GENERATE_FBD);
     break;
   case VEN_MSG_NEED_OUTPUT_BUFFER:
     //TBD what action needs to be done here??
     break;
+  case VEN_MSG_LTRUSE_FAILED:
+    DEBUG_PRINT_ERROR("LTRUSE Failed!");
+    omx->post_event (0, m_sVenc_msg->statuscode,
+      OMX_COMPONENT_GENERATE_LTRUSE_FAILED);
+    break;
   default:
+    DEBUG_PRINT_HIGH("Unknown msg received : %lu", m_sVenc_msg->msgcode);
     break;
   }
   return 0;

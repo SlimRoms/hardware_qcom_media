@@ -1108,43 +1108,6 @@ typedef struct QOMX_VUI_BITSTREAM_RESTRICT {
     OMX_BOOL bEnable;
 } QOMX_VUI_BITSTREAM_RESTRICT;
 
-/**
- * This structure is used to indicate the maximum number of buffers
- * that a port will hold during data flow.
- *
- * STRUCT MEMBERS:
- *  nSize              : Size of the structure in bytes
- *  nVersion           : OMX specification version info
- *  nPortIndex         : Port that this structure applies to
- *  nHeldBufferCount   : Read-only, maximum number of buffers that will be held
- */
-typedef struct QOMX_HELDBUFFERCOUNTTYPE {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nPortIndex;
-    OMX_U32 nHeldBufferCount;
-} QOMX_HELDBUFFERCOUNTTYPE;
-
-typedef enum QOMX_VIDEO_HIERARCHICALCODINGTYPE {
-    QOMX_HIERARCHICALCODING_P = 0x01,
-    QOMX_HIERARCHICALCODING_B = 0x02,
-} QOMX_VIDEO_HIERARCHICALCODINGTYPE;
-
-typedef struct QOMX_VIDEO_HIERARCHICALLAYERS {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nPortIndex;
-    OMX_U32 nNumLayers;
-    QOMX_VIDEO_HIERARCHICALCODINGTYPE eHierarchicalCodingType;
-} QOMX_VIDEO_HIERARCHICALLAYERS;
-
-typedef struct QOMX_VIDEO_H264ENTROPYCODINGTYPE {
-   OMX_U32 nSize;
-   OMX_VERSIONTYPE nVersion;
-   OMX_BOOL bCabac;
-   OMX_U32 nCabacInitIdc;
-} QOMX_VIDEO_H264ENTROPYCODINGTYPE;
-
 /* VIDEO POSTPROCESSING CTRLS AND ENUMS */
 #define QOMX_VPP_HQV_CUSTOMPAYLOAD_SZ 256
 #define VPP_HQV_CONTROL_GLOBAL_START (VPP_HQV_CONTROL_CUST + 1)
@@ -1217,12 +1180,6 @@ typedef struct QOMX_VPP_HQVCONTROL {
 typedef struct QOMX_VPP_ENABLE {
     OMX_BOOL enable_vpp;
 } QOMX_VPP_ENABLE;
-
-typedef struct QOMX_PICTURE_ORDER_COUNT_TYPE {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nType;
-} QOMX_PICTURE_ORDER_COUNT_TYPE;
 
 #ifdef __cplusplus
 }

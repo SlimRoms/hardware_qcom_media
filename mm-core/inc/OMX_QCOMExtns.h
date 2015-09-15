@@ -1430,127 +1430,78 @@ typedef struct QOMX_VUI_BITSTREAM_RESTRICT {
     OMX_BOOL bEnable;
 } QOMX_VUI_BITSTREAM_RESTRICT;
 
-/**
- * Specifies the extended picture types. These values should be
- * OR'd along with the types defined in OMX_VIDEO_PICTURETYPE to
- * signal all pictures types which are allowed.
- *
- * ENUMS:
- *  H.264 Specific Picture Types:   IDR
- */
-typedef enum QOMX_VIDEO_PICTURETYPE {
-    QOMX_VIDEO_PictureTypeIDR = OMX_VIDEO_PictureTypeVendorStartUnused + 0x1000
-} QOMX_VIDEO_PICTURETYPE;
+/* VIDEO POSTPROCESSING CTRLS AND ENUMS */
+#define QOMX_VPP_HQV_CUSTOMPAYLOAD_SZ 256
+#define VPP_HQV_CONTROL_GLOBAL_START (VPP_HQV_CONTROL_CUST + 1)
 
-#define OMX_QCOM_INDEX_CONFIG_ACTIVE_REGION_DETECTION           "OMX.QCOM.index.config.activeregiondetection"
-#define OMX_QCOM_INDEX_CONFIG_ACTIVE_REGION_DETECTION_STATUS    "OMX.QCOM.index.config.activeregiondetectionstatus"
-#define OMX_QCOM_INDEX_CONFIG_SCALING_MODE                      "OMX.QCOM.index.config.scalingmode"
-#define OMX_QCOM_INDEX_CONFIG_NOISEREDUCTION                    "OMX.QCOM.index.config.noisereduction"
-#define OMX_QCOM_INDEX_CONFIG_IMAGEENHANCEMENT                  "OMX.QCOM.index.config.imageenhancement"
-#define OMX_QCOM_INDEX_PARAM_HELDBUFFERCOUNT                    "OMX.QCOM.index.param.HeldBufferCount" /**< reference: QOMX_HELDBUFFERCOUNTTYPE */
+typedef enum QOMX_VPP_HQV_MODE {
+    VPP_HQV_MODE_OFF,
+    VPP_HQV_MODE_AUTO,
+    VPP_HQV_MODE_MANUAL,
+    VPP_HQV_MODE_MAX
+} QOMX_VPP_HQV_MODE;
+
+typedef enum QOMX_VPP_HQVCONTROLTYPE {
+    VPP_HQV_CONTROL_CADE = 0x1,
+    VPP_HQV_CONTROL_CNR = 0x04,
+    VPP_HQV_CONTROL_AIE = 0x05,
+    VPP_HQV_CONTROL_CUST = 0x07,
+    VPP_HQV_CONTROL_GLOBAL_DEMO = VPP_HQV_CONTROL_GLOBAL_START,
+    VPP_HQV_CONTROL_MAX,
+} QOMX_VPP_HQVCONTROLTYPE;
+
+typedef enum QOMX_VPP_HQV_HUE_MODE {
+    VPP_HQV_HUE_MODE_OFF,
+    VPP_HQV_HUE_MODE_ON,
+    VPP_HQV_HUE_MODE_MAX,
+} QOMX_VPP_HQV_HUE_MODE;
+
+typedef struct QOMX_VPP_HQVCTRL_CADE {
+    QOMX_VPP_HQV_MODE mode;
+    OMX_U32 level;
+    OMX_S32 contrast;
+    OMX_S32 saturation;
+} QOMX_VPP_HQVCTRL_CADE;
+
+typedef struct QOMX_VPP_HQVCTRL_CNR {
+    QOMX_VPP_HQV_MODE mode;
+    OMX_U32 level;
+} QOMX_VPP_HQVCTRL_CNR;
+
+typedef struct QOMX_VPP_HQVCTRL_AIE {
+    QOMX_VPP_HQV_MODE mode;
+    QOMX_VPP_HQV_HUE_MODE hue_mode;
+    OMX_U32 cade_level;
+    OMX_U32 ltm_level;
+} QOMX_VPP_HQVCTRL_AIE;
+
+typedef struct QOMX_VPP_HQVCTRL_CUSTOM {
+    OMX_U32 id;
+    OMX_U32 len;
+    OMX_U8 data[QOMX_VPP_HQV_CUSTOMPAYLOAD_SZ];
+} QOMX_VPP_HQVCTRL_CUSTOM;
+
+typedef struct QOMX_VPP_HQVCTRL_GLOBAL_DEMO {
+    OMX_U32 process_percent;
+} QOMX_VPP_HQVCTRL_GLOBAL_DEMO;
 
 
-typedef struct QOMX_RECTTYPE {
-    OMX_S32 nLeft;
-    OMX_S32 nTop;
-    OMX_U32 nWidth;
-    OMX_U32 nHeight;
-} QOMX_RECTTYPE;
+typedef struct QOMX_VPP_HQVCONTROL {
+    QOMX_VPP_HQV_MODE mode;
+    QOMX_VPP_HQVCONTROLTYPE ctrl_type;
+    union {
+        QOMX_VPP_HQVCTRL_CADE cade;
+        QOMX_VPP_HQVCTRL_CNR cnr;
+        QOMX_VPP_HQVCTRL_AIE aie;
+        QOMX_VPP_HQVCTRL_CUSTOM custom;
+        QOMX_VPP_HQVCTRL_GLOBAL_DEMO global_demo;
+    };
+} QOMX_VPP_HQVCONTROL;
 
-typedef struct QOMX_ACTIVEREGIONDETECTIONTYPE {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nPortIndex;
-    OMX_BOOL bEnable;
-    QOMX_RECTTYPE sROI;
-    OMX_U32 nNumExclusionRegions;
-    QOMX_RECTTYPE sExclusionRegions[1];
-} QOMX_ACTIVEREGIONDETECTIONTYPE;
-
-typedef struct QOMX_ACTIVEREGIONDETECTION_STATUSTYPE {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nPortIndex;
-    OMX_BOOL bDetected;
-    QOMX_RECTTYPE sDetectedRegion;
-} QOMX_ACTIVEREGIONDETECTION_STATUSTYPE;
-
-typedef enum QOMX_SCALE_MODETYPE {
-    QOMX_SCALE_MODE_Normal,
-    QOMX_SCALE_MODE_Anamorphic,
-    QOMX_SCALE_MODE_Max = 0x7FFFFFFF
-} QOMX_SCALE_MODETYPE;
-
-typedef struct QOMX_SCALINGMODETYPE {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    QOMX_SCALE_MODETYPE  eScaleMode;
-} QOMX_SCALINGMODETYPE;
-
-typedef struct QOMX_NOISEREDUCTIONTYPE {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nPortIndex;
-    OMX_BOOL bEnable;
-    OMX_BOOL bAutoMode;
-    OMX_S32 nNoiseReduction;
-} QOMX_NOISEREDUCTIONTYPE;
-
-typedef struct QOMX_IMAGEENHANCEMENTTYPE {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nPortIndex;
-    OMX_BOOL bEnable;
-    OMX_BOOL bAutoMode;
-    OMX_S32 nImageEnhancement;
-} QOMX_IMAGEENHANCEMENTTYPE;
-
-/*
- * these are part of OMX1.2 but JB MR2 branch doesn't have them defined
- * OMX_IndexParamInterlaceFormat
- * OMX_INTERLACEFORMATTYPE
- */
-#ifndef OMX_IndexParamInterlaceFormat
-#define OMX_IndexParamInterlaceFormat (0x7FF00000)
-typedef struct OMX_INTERLACEFORMATTYPE {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nPortIndex;
-    OMX_U32 nFormat;
-    OMX_TICKS nTimeStamp;
-} OMX_INTERLACEFORMATTYPE;
-#endif
-
-/**
- * This structure is used to indicate the maximum number of buffers
- * that a port will hold during data flow.
- *
- * STRUCT MEMBERS:
- *  nSize              : Size of the structure in bytes
- *  nVersion           : OMX specification version info
- *  nPortIndex         : Port that this structure applies to
- *  nHeldBufferCount   : Read-only, maximum number of buffers that will be held
- */
-typedef struct QOMX_HELDBUFFERCOUNTTYPE {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nPortIndex;
-    OMX_U32 nHeldBufferCount;
-} QOMX_HELDBUFFERCOUNTTYPE;
-
-typedef enum QOMX_VIDEO_HIERARCHICALCODINGTYPE {
-    QOMX_HIERARCHICALCODING_P = 0x01,
-    QOMX_HIERARCHICALCODING_B = 0x02,
-} QOMX_VIDEO_HIERARCHICALCODINGTYPE;
-
-typedef struct QOMX_VIDEO_HIERARCHICALLAYERS {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nPortIndex;
-    OMX_U32 nNumLayers;
-    QOMX_VIDEO_HIERARCHICALCODINGTYPE eHierarchicalCodingType;
-} QOMX_VIDEO_HIERARCHICALLAYERS;
-
+/* STRUCTURE TO TURN VPP ON */
+typedef struct QOMX_VPP_ENABLE {
+    OMX_BOOL enable_vpp;
+} QOMX_VPP_ENABLE;
 
 #ifdef __cplusplus
 }

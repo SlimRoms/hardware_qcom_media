@@ -558,8 +558,8 @@ omx_vdec::omx_vdec(): m_state(OMX_StateInvalid),
                       m_smoothstreaming_width(0),
                       m_use_smoothstreaming(false),
 #ifdef _ANDROID_
-                      m_heap_ptr(NULL),
-                      m_heap_count(0),
+                      proc_frms(0),
+                      latency(0),
                       m_enable_android_native_buffers(OMX_FALSE),
                       m_use_android_native_buffers(OMX_FALSE),
 #endif
@@ -584,13 +584,10 @@ omx_vdec::omx_vdec(): m_state(OMX_StateInvalid),
   DEBUG_PRINT_HIGH("In OMX vdec Constructor");
 #ifdef _ANDROID_
   char property_value[PROPERTY_VALUE_MAX] = {0};
-<<<<<<< HEAD
-=======
   property_get("vidc.debug.level", property_value, "1");
   debug_level = atoi(property_value);
   property_value[0] = '\0';
 
->>>>>>> 6d961ba... mm-video: vdec: Fix for CTS test case VP8Flex1080p
   property_get("vidc.dec.debug.perf", property_value, "0");
   perf_flag = atoi(property_value);
   if (perf_flag)
@@ -5328,13 +5325,6 @@ OMX_ERRORTYPE  omx_vdec::allocate_output_buffer(
         OMX_IN OMX_PTR                   appData,
         OMX_IN OMX_U32                   bytes)
 {
-<<<<<<< HEAD
-  OMX_ERRORTYPE eRet = OMX_ErrorNone;
-  OMX_BUFFERHEADERTYPE       *bufHdr= NULL; // buffer header
-  unsigned                         i= 0; // Temporary counter
-  struct vdec_ioctl_msg ioctl_msg = {NULL,NULL};
-  struct vdec_setbuffer_cmd setbuffers;
-=======
     (void)hComp;
     (void)port;
     OMX_ERRORTYPE eRet = OMX_ErrorNone;
@@ -5342,63 +5332,12 @@ OMX_ERRORTYPE  omx_vdec::allocate_output_buffer(
     unsigned              i = 0; // Temporary counter
     struct vdec_ioctl_msg ioctl_msg = {NULL,NULL};
     struct vdec_setbuffer_cmd setbuffers;
->>>>>>> 6d961ba... mm-video: vdec: Fix for CTS test case VP8Flex1080p
 #ifdef USE_ION
     int ion_device_fd = -1;
     struct ion_allocation_data ion_alloc_data;
     struct ion_fd_data fd_ion_data;
 #endif
 
-<<<<<<< HEAD
-  int nBufHdrSize        = 0;
-  int nPlatformEntrySize = 0;
-  int nPlatformListSize  = 0;
-  int nPMEMInfoSize = 0;
-  int pmem_fd = -1;
-  unsigned char *pmem_baseaddress = NULL;
-
-  OMX_QCOM_PLATFORM_PRIVATE_LIST      *pPlatformList;
-  OMX_QCOM_PLATFORM_PRIVATE_ENTRY     *pPlatformEntry;
-  OMX_QCOM_PLATFORM_PRIVATE_PMEM_INFO *pPMEMInfo;
-
-  if (!m_out_mem_ptr)
-  {
-    DEBUG_PRINT_HIGH("Allocate o/p buffer Header: Cnt(%d) Sz(%d)",
-      drv_ctx.op_buf.actualcount,
-      drv_ctx.op_buf.buffer_size);
-
-    DEBUG_PRINT_LOW("Allocating First Output Buffer(%d)",
-      drv_ctx.op_buf.actualcount);
-
-    nBufHdrSize        = drv_ctx.op_buf.actualcount *
-                         sizeof(OMX_BUFFERHEADERTYPE);
-
-    nPMEMInfoSize      = drv_ctx.op_buf.actualcount *
-                         sizeof(OMX_QCOM_PLATFORM_PRIVATE_PMEM_INFO);
-    nPlatformListSize  = drv_ctx.op_buf.actualcount *
-                         sizeof(OMX_QCOM_PLATFORM_PRIVATE_LIST);
-    nPlatformEntrySize = drv_ctx.op_buf.actualcount *
-                         sizeof(OMX_QCOM_PLATFORM_PRIVATE_ENTRY);
-
-    DEBUG_PRINT_LOW("TotalBufHdr %d BufHdrSize %d PMEM %d PL %d",nBufHdrSize,
-                         sizeof(OMX_BUFFERHEADERTYPE),
-                         nPMEMInfoSize,
-                         nPlatformListSize);
-    DEBUG_PRINT_LOW("PE %d OutputBuffer Count %d",nPlatformEntrySize,
-                         drv_ctx.op_buf.actualcount);
-
-    m_out_mem_ptr = (OMX_BUFFERHEADERTYPE  *)calloc(nBufHdrSize,1);
-    // Alloc mem for platform specific info
-    char *pPtr=NULL;
-    pPtr = (char*) calloc(nPlatformListSize + nPlatformEntrySize +
-                                     nPMEMInfoSize,1);
-    drv_ctx.ptr_outputbuffer = (struct vdec_bufferpayload *)\
-      calloc (sizeof(struct vdec_bufferpayload),
-      drv_ctx.op_buf.actualcount);
-    drv_ctx.ptr_respbuffer = (struct vdec_output_frameinfo  *)\
-      calloc (sizeof (struct vdec_output_frameinfo),
-      drv_ctx.op_buf.actualcount);
-=======
     int nBufHdrSize        = 0;
     int nPlatformEntrySize = 0;
     int nPlatformListSize  = 0;
@@ -5447,7 +5386,6 @@ OMX_ERRORTYPE  omx_vdec::allocate_output_buffer(
         drv_ctx.ptr_respbuffer = (struct vdec_output_frameinfo  *)\
                     calloc (sizeof (struct vdec_output_frameinfo),
                             drv_ctx.op_buf.actualcount);
->>>>>>> 6d961ba... mm-video: vdec: Fix for CTS test case VP8Flex1080p
 #ifdef USE_ION
         drv_ctx.op_buf_ion_info = (struct vdec_ion *)\
                     calloc (sizeof(struct vdec_ion),
@@ -5577,150 +5515,14 @@ OMX_ERRORTYPE  omx_vdec::allocate_output_buffer(
     }
   }
 
-<<<<<<< HEAD
-  for (i=0; i< drv_ctx.op_buf.actualcount; i++)
-  {
-    if(BITMASK_ABSENT_U32(m_out_bm_count,i))
-    {
-      DEBUG_PRINT_LOW("Found a Free Output Buffer Index %d",i);
-      break;
-=======
     for (i = 0; i < drv_ctx.op_buf.actualcount; i++) {
         if (BITMASK_ABSENT_U32(m_out_bm_count,i)) {
             DEBUG_PRINT_LOW("Found a Free Output Buffer Index %d\n", i);
             break;
         }
->>>>>>> 6d961ba... mm-video: vdec: Fix for CTS test case VP8Flex1080p
     }
   }
 
-<<<<<<< HEAD
-  if (i < drv_ctx.op_buf.actualcount)
-  {
-    DEBUG_PRINT_LOW("Allocate Output Buffer");
-
-#ifdef USE_ION
-    drv_ctx.op_buf_ion_info[i].ion_device_fd = alloc_map_ion_memory(
-                    drv_ctx.op_buf.buffer_size,drv_ctx.op_buf.alignment,
-                    &drv_ctx.op_buf_ion_info[i].ion_alloc_data,
-                    &drv_ctx.op_buf_ion_info[i].fd_ion_data, 0);
-    if (drv_ctx.op_buf_ion_info[i].ion_device_fd < 0) {
-        return OMX_ErrorInsufficientResources;
-     }
-    pmem_fd = drv_ctx.op_buf_ion_info[i].fd_ion_data.fd;
-#else
-    pmem_fd = open (MEM_DEVICE,O_RDWR);
-
-    if (pmem_fd < 0)
-    {
-      DEBUG_PRINT_ERROR("\nERROR:pmem fd for output buffer %d",
-        drv_ctx.op_buf.buffer_size);
-      return OMX_ErrorInsufficientResources;
-    }
-
-    if (pmem_fd == 0)
-    {
-      pmem_fd = open (MEM_DEVICE,O_RDWR);
-
-      if (pmem_fd < 0)
-      {
-         DEBUG_PRINT_ERROR("\nERROR:pmem fd for output buffer %d",
-           drv_ctx.op_buf.buffer_size);
-         return OMX_ErrorInsufficientResources;
-      }
-    }
-
-    if (!align_pmem_buffers(pmem_fd, drv_ctx.op_buf.buffer_size,
-      drv_ctx.op_buf.alignment))
-    {
-      DEBUG_PRINT_ERROR("\n align_pmem_buffers() failed");
-      close(pmem_fd);
-      return OMX_ErrorInsufficientResources;
-    }
-#endif
-    if (!secure_mode) {
-        pmem_baseaddress = (unsigned char *)mmap(NULL,
-                           drv_ctx.op_buf.buffer_size,
-                           PROT_READ|PROT_WRITE,MAP_SHARED,pmem_fd,0);
-
-        if (pmem_baseaddress == MAP_FAILED)
-        {
-          DEBUG_PRINT_ERROR("\n MMAP failed for Size %d",
-          drv_ctx.op_buf.buffer_size);
-#ifndef USE_ION
-          close(pmem_fd);
-#else
-          free_ion_memory(&drv_ctx.op_buf_ion_info[i]);
-#endif
-          pmem_fd = -1;
-          return OMX_ErrorInsufficientResources;
-        }
-    }
-
-    *bufferHdr = (m_out_mem_ptr + i);
-    if (secure_mode)
-        drv_ctx.ptr_outputbuffer [i].bufferaddr = *bufferHdr;
-    else
-        drv_ctx.ptr_outputbuffer [i].bufferaddr = pmem_baseaddress;
-
-    drv_ctx.ptr_outputbuffer [i].pmem_fd = pmem_fd;
-    drv_ctx.ptr_outputbuffer [i].buffer_len = drv_ctx.op_buf.buffer_size;
-    drv_ctx.ptr_outputbuffer [i].mmaped_size = drv_ctx.op_buf.buffer_size;
-    drv_ctx.ptr_outputbuffer [i].offset = 0;
-
-#ifdef _ANDROID_
- #ifdef USE_ION
-    m_heap_ptr[i].video_heap_ptr = new VideoHeap (drv_ctx.op_buf_ion_info[i].ion_device_fd,
-                                drv_ctx.op_buf.buffer_size,
-                                pmem_baseaddress,
-                                ion_alloc_data.handle,
-                                pmem_fd);
-    m_heap_count = m_heap_count + 1;
-#else
-    m_heap_ptr[i].video_heap_ptr = new VideoHeap (pmem_fd,
-                                drv_ctx.op_buf.buffer_size,
-                                pmem_baseaddress);
-#endif
-#endif
-
-    m_pmem_info[i].offset = drv_ctx.ptr_outputbuffer[i].offset;
-#ifdef _ANDROID_
-    m_pmem_info[i].pmem_fd = (OMX_U32) m_heap_ptr[i].video_heap_ptr.get ();
-#else
-    m_pmem_info[i].pmem_fd = drv_ctx.ptr_outputbuffer[i].pmem_fd ;
-#endif
-    m_pmem_info[i].size = drv_ctx.ptr_outputbuffer[i].buffer_len;
-    m_pmem_info[i].mapped_size = drv_ctx.ptr_outputbuffer[i].mmaped_size;
-    m_pmem_info[i].buffer = drv_ctx.ptr_outputbuffer[i].bufferaddr;
-
-    setbuffers.buffer_type = VDEC_BUFFER_TYPE_OUTPUT;
-    memcpy (&setbuffers.buffer,&drv_ctx.ptr_outputbuffer [i],
-            sizeof (vdec_bufferpayload));
-    ioctl_msg.in  = &setbuffers;
-    ioctl_msg.out = NULL;
-
-    DEBUG_PRINT_LOW("Set the Output Buffer Idx: %d Addr: %x", i, drv_ctx.ptr_outputbuffer[i]);
-    if (ioctl (drv_ctx.video_driver_fd,VDEC_IOCTL_SET_BUFFER,
-         &ioctl_msg) < 0)
-    {
-      DEBUG_PRINT_ERROR("\n Set output buffer failed");
-      return OMX_ErrorInsufficientResources;
-    }
-
-    // found an empty buffer at i
-    (*bufferHdr)->nAllocLen = drv_ctx.op_buf.buffer_size;
-    (*bufferHdr)->pBuffer = (OMX_U8*)drv_ctx.ptr_outputbuffer[i].bufferaddr;
-    (*bufferHdr)->pAppPrivate = appData;
-    m_out_bm_count = BITMASK_SET_U32(m_out_bm_count,i);
-
-  }
-  else
-  {
-    DEBUG_PRINT_ERROR("\nERROR:Output Buffer Index not found");
-    eRet = OMX_ErrorInsufficientResources;
-  }
-  return eRet;
-=======
     if (eRet == OMX_ErrorNone) {
         if (i < drv_ctx.op_buf.actualcount) {
             DEBUG_PRINT_LOW("Allocate Output Buffer");
@@ -5849,7 +5651,6 @@ OMX_ERRORTYPE  omx_vdec::allocate_output_buffer(
     }
 
     return eRet;
->>>>>>> 6d961ba... mm-video: vdec: Fix for CTS test case VP8Flex1080p
 }
 
 
@@ -10693,13 +10494,8 @@ OMX_ERRORTYPE omx_vdec::allocate_color_convert_buf::allocate_buffers_color_conve
     return eRet == OMX_ErrorNone ? OMX_ErrorInsufficientResources : eRet;
   }
   if ((temp_bufferHdr - omx->m_out_mem_ptr) >=
-<<<<<<< HEAD
-      omx->drv_ctx.op_buf.actualcount) {
-    DEBUG_PRINT_ERROR("\n Invalid header index %d",
-=======
       (int)omx->drv_ctx.op_buf.actualcount) {
     DEBUG_PRINT_ERROR("Invalid header index %d\n",
->>>>>>> 6d961ba... mm-video: vdec: Fix for CTS test case VP8Flex1080p
              (temp_bufferHdr - omx->m_out_mem_ptr));
     return OMX_ErrorUndefined;
   }

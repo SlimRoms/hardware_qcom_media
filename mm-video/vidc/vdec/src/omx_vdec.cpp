@@ -4198,33 +4198,42 @@ OMX_ERRORTYPE  omx_vdec::set_config(OMX_IN OMX_HANDLETYPE      hComp,
       // minus 1 --> picture param set byte to be ignored from avcatom
       m_vendor_config.nDataSize = config->nDataSize - 6 - 1 + extra_size;
       m_vendor_config.pData = (OMX_U8 *) malloc(m_vendor_config.nDataSize);
-      OMX_U32 len;
-      OMX_U8 index = 0;
-      // case where SPS+PPS is sent as part of set_config
-      pDestBuf = m_vendor_config.pData;
 
-      DEBUG_PRINT_LOW("Rxd SPS+PPS nPortIndex[%d] len[%d] data[0x%x]",
-           m_vendor_config.nPortIndex,
-           m_vendor_config.nDataSize,
-           m_vendor_config.pData);
-      while (index < 2)
+      if (m_vendor_config.pData)
       {
-        uint8 *psize;
-        len = *pSrcBuf;
-        len = len << 8;
-        len |= *(pSrcBuf + 1);
-        psize = (uint8 *) & len;
-        memcpy(pDestBuf + nal_length, pSrcBuf + 2,len);
-        for (int i = 0; i < nal_length; i++)
-        {
-          pDestBuf[i] = psize[nal_length - 1 - i];
-        }
-        //memcpy(pDestBuf,pSrcBuf,(len+2));
-        pDestBuf += len + nal_length;
-        pSrcBuf += len + 2;
-        index++;
-        pSrcBuf++;   // skip picture param set
-        len = 0;
+          OMX_U32 len;
+          OMX_U8 index = 0;
+          // case where SPS+PPS is sent as part of set_config
+          pDestBuf = m_vendor_config.pData;
+
+          DEBUG_PRINT_LOW("Rxd SPS+PPS nPortIndex[%d] len[%d] data[0x%x]",
+               m_vendor_config.nPortIndex,
+               m_vendor_config.nDataSize,
+               m_vendor_config.pData);
+          while (index < 2)
+          {
+            uint8 *psize;
+            len = *pSrcBuf;
+            len = len << 8;
+            len |= (OMX_U32)(*(pSrcBuf + 1));
+            psize = (uint8 *) & len;
+            memcpy(pDestBuf + nal_length, pSrcBuf + 2,len);
+            for (int i = 0; i < nal_length; i++)
+            {
+              pDestBuf[i] = psize[nal_length - 1 - i];
+            }
+            //memcpy(pDestBuf,pSrcBuf,(len+2));
+            pDestBuf += len + nal_length;
+            pSrcBuf += len + 2;
+            index++;
+            pSrcBuf++;   // skip picture param set
+            len = 0;
+          }
+      }
+      else
+      {
+         DEBUG_PRINT_ERROR("memory allocation for m_vendor_config.pData failed");
+         ret = OMX_ErrorInsufficientResources;
       }
     }
     else if (!strcmp(drv_ctx.kind, "OMX.qcom.video.decoder.mpeg4") ||

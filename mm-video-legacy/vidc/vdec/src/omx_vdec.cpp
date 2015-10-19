@@ -538,8 +538,8 @@ omx_vdec::omx_vdec(): msg_thread_id(0),
                       h264_last_au_flags(0),
                       m_inp_err_count(0),
 #ifdef _ANDROID_
-                      m_heap_ptr(NULL),
-                      m_heap_count(0),
+                      proc_frms(0),
+                      latency(0),
                       m_enable_android_native_buffers(OMX_FALSE),
                       m_use_android_native_buffers(OMX_FALSE),
 #endif

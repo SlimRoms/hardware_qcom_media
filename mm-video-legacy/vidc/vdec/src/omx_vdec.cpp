@@ -146,9 +146,7 @@ char ouputextradatafilename [] = "/data/extradata";
 
 #define Log2(number, power)  { OMX_U32 temp = number; power = 0; while( (0 == (temp & 0x1)) &&  power < 16) { temp >>=0x1; power++; } }
 #define Q16ToFraction(q,num,den) { OMX_U32 power; Log2(q,power);  num = q >> power; den = 0x1 << (16 - power); }
-#define ALIGN( num, to ) (((num) + (to-1)) & (~(to-1)))
-#define ALIGN32 32
-#define ALIGN16 16
+#define ALIGN(x, to_align) ((((unsigned) x) + (to_align - 1)) & ~(to_align - 1))
 
 bool omx_vdec::m_secure_display = false;
 
@@ -8005,14 +8003,23 @@ OMX_ERRORTYPE omx_vdec::update_portdef(OMX_PARAM_PORTDEFINITIONTYPE *portDefn)
   }
   portDefn->format.video.nFrameHeight =  drv_ctx.video_resolution.frame_height;
   portDefn->format.video.nFrameWidth  =  drv_ctx.video_resolution.frame_width;
-  portDefn->format.video.nStride = client_buffers.get_output_stride();
-  portDefn->format.video.nSliceHeight = client_buffers.get_output_scanlines();
-
-  DEBUG_PRINT_LOW("update_portdef Width = %d Height = %d Stride = %u"
-    "SliceHeight = %u \n", portDefn->format.video.nFrameHeight,
-    portDefn->format.video.nFrameWidth,
-    portDefn->format.video.nStride,
-    portDefn->format.video.nSliceHeight);
+  portDefn->format.video.nStride = drv_ctx.video_resolution.stride;
+  portDefn->format.video.nSliceHeight = drv_ctx.video_resolution.scan_lines;
+  if ((portDefn->format.video.eColorFormat == OMX_COLOR_FormatYUV420Planar) ||
+      (portDefn->format.video.eColorFormat == OMX_COLOR_FormatYUV420SemiPlanar)) {
+    portDefn->format.video.nStride = ALIGN(drv_ctx.video_resolution.frame_width, C2D_SP_YBUF_ALIGN);
+    portDefn->format.video.nSliceHeight = drv_ctx.video_resolution.frame_height;
+  }
+  DEBUG_PRINT_LOW("update_portdef(%u): Width = %u Height = %u Stride = %d "
+    "SliceHeight = %u eColorFormat = 0x%x nBufSize %u nBufCnt %u",
+    (unsigned int)portDefn->nPortIndex,
+    (unsigned int)portDefn->format.video.nFrameWidth,
+    (unsigned int)portDefn->format.video.nFrameHeight,
+    (int)portDefn->format.video.nStride,
+    (unsigned int)portDefn->format.video.nSliceHeight,
+    (unsigned int)portDefn->format.video.eColorFormat,
+    (unsigned int)portDefn->nBufferSize,
+    (unsigned int)portDefn->nBufferCountActual);
   return eRet;
 
 }

@@ -207,10 +207,6 @@ struct msm_venc_vpx_error_resilience {
     unsigned int enable;
 };
 
-struct msm_venc_priority {
-    OMX_U32 priority;
-};
-
 enum v4l2_ports {
     CAPTURE_PORT,
     OUTPUT_PORT,
@@ -354,7 +350,6 @@ class venc_dev
         struct msm_venc_peak_bitrate        peak_bitrate;
         struct msm_venc_ltrinfo             ltrinfo;
         struct msm_venc_vpx_error_resilience vpx_err_resilience;
-        struct msm_venc_priority            sess_priority;
 
         bool venc_set_profile_level(OMX_U32 eProfile,OMX_U32 eLevel);
         bool venc_set_intra_period(OMX_U32 nPFrames, OMX_U32 nBFrames);
@@ -399,8 +394,11 @@ class venc_dev
         bool venc_set_hybrid_hierp(OMX_U32 layers);
         bool venc_calibrate_gop();
         bool venc_validate_hybridhp_params(OMX_U32 layers, OMX_U32 bFrames, OMX_U32 count, int mode);
+<<<<<<< HEAD
         bool venc_set_session_priority(OMX_U32 priority);
 >>>>>>> parent of dce0acf... mm-video-v4l2: vidc: add support for setting operating-rate
+=======
+>>>>>>> parent of eb0227e... mm-video-v4l2: Add extended config to set instance priority
 
 #ifdef MAX_RES_1080P
         OMX_U32 pmem_free();

@@ -3462,8 +3462,8 @@ OMX_ERRORTYPE  omx_video::empty_this_buffer_proxy(OMX_IN OMX_HANDLETYPE         
                     Input_pmem_info.fd, Input_pmem_info.offset,
                     Input_pmem_info.size);
         } else {
-        VideoGrallocMetadata *media_buffer = (VideoGrallocMetadata *)meta_buffer_hdr[nBufIndex].pBuffer;
-        private_handle_t *handle = (private_handle_t *)media_buffer->pHandle;
+            VideoGrallocMetadata *media_buffer = (VideoGrallocMetadata *)meta_buffer_hdr[nBufIndex].pBuffer;
+            private_handle_t *handle = (private_handle_t *)media_buffer->pHandle;
             Input_pmem_info.buffer = media_buffer;
             Input_pmem_info.fd = handle->fd;
 #ifdef _MSM8974_
@@ -4403,8 +4403,8 @@ void omx_video::omx_release_meta_buffer(OMX_BUFFERHEADERTYPE *buffer)
                             Input_pmem.offset,
                             Input_pmem.size);
                 } else if (media_ptr->buffer_type == kMetadataBufferTypeGrallocSource) {
-                VideoGrallocMetadata *media_ptr = (VideoGrallocMetadata *)buffer->pBuffer;
-                private_handle_t *handle = (private_handle_t *)media_ptr->pHandle;
+                    VideoGrallocMetadata *media_ptr = (VideoGrallocMetadata *)buffer->pBuffer;
+                    private_handle_t *handle = (private_handle_t *)media_ptr->pHandle;
                     Input_pmem.buffer = media_ptr;
                     Input_pmem.fd = handle->fd;
                     Input_pmem.offset = 0;
@@ -4592,6 +4592,10 @@ OMX_ERRORTYPE  omx_video::empty_this_buffer_opaque(OMX_IN OMX_HANDLETYPE hComp,
         return OMX_ErrorBadParameter;
     } else if (media_buffer) {
         handle = (private_handle_t *)media_buffer->pHandle;
+    }
+
+    if (media_buffer->eType == kMetadataBufferTypeCameraSource) {
+        return empty_this_buffer_proxy(hComp, buffer);
     }
 
     if (buffer->nFilledLen > 0 && handle) {
@@ -4816,8 +4820,8 @@ OMX_ERRORTYPE omx_video::push_input_buffer(OMX_HANDLETYPE hComp)
                     Input_pmem_info.size);
             ret = queue_meta_buffer(hComp,Input_pmem_info);
         } else {
-        VideoGrallocMetadata *media_buffer = (VideoGrallocMetadata *)psource_frame->pBuffer;
-        private_handle_t *handle = (private_handle_t *)media_buffer->pHandle;
+            VideoGrallocMetadata *media_buffer = (VideoGrallocMetadata *)psource_frame->pBuffer;
+            private_handle_t *handle = (private_handle_t *)media_buffer->pHandle;
             Input_pmem_info.buffer = media_buffer;
             Input_pmem_info.fd = handle->fd;
             Input_pmem_info.offset = 0;

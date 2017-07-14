@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "54b8c0bc_71663926",
+        "filename": "mm-video-v4l2/vidc/venc/inc/video_encoder_device_v4l2.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1000043
+      },
+      "writtenOn": "2017-07-14T14:03:04Z",
+      "side": 1,
+      "message": "Dumb question, but isn\u0027t it better creating the header file with this in it, avoid future conflicts with caf?",
+      "range": {
+        "startLine": 311,
+        "startChar": 0,
+        "endLine": 325,
+        "endChar": 6
+      },
+      "revId": "a99eb14f056a6260746c036cb1a722c270975013",
+      "serverId": "f8201d64-d729-4630-b91d-5f8be02869f0",
+      "unresolved": false
+    }
+  ]
+}
